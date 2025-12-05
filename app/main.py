@@ -132,8 +132,7 @@ if run_btn:
 else:
     st.info(
         "👉 Subí archivos y configurá opciones en la barra lateral, "
-        "luego presioná **"Procesar y consolidar"** para comenzar."
-    )
+ "luego presioná **'Procesar y consolidar'*** para comenzar."    )
 
 st.markdown("---")
 st.caption(
