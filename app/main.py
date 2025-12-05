@@ -9,9 +9,13 @@ Aplicación principal de Streamlit - BI Retail Analytics
 - Muestra KPIs y permite descargar un Excel con el resultado.
 """
 
-import io
-from pathlib import Path
 
+import sys
+from pathlib import Path
+# Agregar el directorio raíz al path para permitir imports desde src/
+PROJECT_ROOT = Path(__file__).parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 import pandas as pd
 import streamlit as st
 
