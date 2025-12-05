@@ -69,8 +69,7 @@ st.subheader("1️⃣ Cargar y procesar datos")
 st.write(
     "- Subí los archivos Excel mensuales de cada sucursal en la barra lateral.\n"
     "- Elegí el esquema de columnas que querés en el Excel de salida.\n"
-    "- Presioná **"Procesar y consolidar"** para generar el dataset consolidado."
-)
+ "- Presioná **'Procesar y consolidar'** para generar el dataset consolidado.")
 
 if run_btn:
     if not uploaded_files:
