@@ -1,5 +1,11 @@
-import streamlit as st
+import sys
 from pathlib import Path
+# Agregar el directorio raíz al path para permitir imports desde src/
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+import streamlit as st
 import pandas as pd
 import io
 
@@ -8,86 +14,49 @@ from src.analytics.kpis import compute_kpis
 from src.analytics.analysis import abc_by_revenue
 from src.analytics.projections import top_velocity
 
+st.set_page_config(page_title="Reportes Consolidados", layout="wide")
 
-st.set_page_config(page_title="Reportes", layout="wide")
-st.title("📑 Reportes Ejecutivos")
+st.title("📄 Reportes Consolidados")
+st.write("Genera reportes completos con todos los análisis.")
 
 processed_path = Path(PROCESSED_DIR) / "ventas_procesadas.parquet"
 
 if not processed_path.exists():
-    st.info("Primero procesá y guardá datos consolidados (por ejemplo desde la página principal / Dashboard).")
-    st.stop()
+    st.info("Primeró procesá datos en la página principal.")
+else:
+    df = pd.read_parquet(processed_path)
 
-df = pd.read_parquet(processed_path)
-
-tipo_reporte = st.radio(
-    "Tipo de reporte",
-    options=["Ejecutivo (Excel)", "Detalle ABC (Excel)", "Top Velocidad (Excel)", "PDF (futuro)"],
-    horizontal=True,
-)
-
-if tipo_reporte == "Ejecutivo (Excel)":
-    st.subheader("Reporte Ejecutivo (Excel)")
-
+    st.subheader("📊 KPIs Principales")
     kpis = compute_kpis(df)
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Facturación total", f"${kpis['facturacion_total']:,.0f}")
-    c2.metric("Unidades totales", f"{kpis['unidades_totales']:,.0f}")
-    c3.metric("Ticket promedio", f"${kpis['ticket_promedio']:,.0f}")
-    c4.metric("SKUs", f"{kpis['skus']}")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Facturación", f"${kpis['total_sales']:,.0f}")
+    col2.metric("Unidades", f"{kpis['total_units']:,.0f}")
+    col3.metric("Ticket promedio", f"${kpis['avg_ticket']:,.0f}")
+    col4.metric("SKUs", f"{kpis['unique_skus']}")
+
+    # Generar reporte Excel completo
+    st.subheader("⬇️ Descargar reporte completo")
 
     buffer = io.BytesIO()
     with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-        df.to_excel(writer, index=False, sheet_name="Detalle")
+        # Pestaña 1: Datos consolidados
+        df.to_excel(writer, index=False, sheet_name="Datos")
+
+        # Pestaña 2: Análisis ABC
+        abc = abc_by_revenue(df)
+        abc.to_excel(writer, index=False, sheet_name="ABC")
+
+        # Pestaña 3: Top velocidad
+        top_vel = top_velocity(df, top_n=100)
+        top_vel.to_excel(writer, index=False, sheet_name="TopVelocidad")
+
     buffer.seek(0)
 
     st.download_button(
-        label="⬇️ Descargar reporte ejecutivo (Excel)",
+        label="⬇️ Descargar reporte completo Excel",
         data=buffer,
-        file_name="reporte_ejecutivo.xlsx",
+        file_name="reporte_completo.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
-elif tipo_reporte == "Detalle ABC (Excel)":
-    st.subheader("Reporte ABC (Excel)")
-
-    tabla_abc = abc_by_revenue(df)
-    st.dataframe(tabla_abc.head(50), use_container_width=True)
-
-    buffer = io.BytesIO()
-    with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-        tabla_abc.to_excel(writer, index=False, sheet_name="ABC")
-    buffer.seek(0)
-
-    st.download_button(
-        label="⬇️ Descargar detalle ABC (Excel)",
-        data=buffer,
-        file_name="reporte_abc.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    )
-
-elif tipo_reporte == "Top Velocidad (Excel)":
-    st.subheader("Reporte Top Velocidad (Excel)")
-
-    top_n = st.slider("Top N productos", min_value=20, max_value=200, value=50, step=10)
-    tabla_top = top_velocity(df, n=top_n)
-    st.dataframe(tabla_top, use_container_width=True)
-
-    buffer = io.BytesIO()
-    with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-        tabla_top.to_excel(writer, index=False, sheet_name="Top_Velocidad")
-    buffer.seek(0)
-
-    st.download_button(
-        label="⬇️ Descargar Top Velocidad (Excel)",
-        data=buffer,
-        file_name="reporte_top_velocidad.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    )
-
-else:  # PDF (futuro)
-    st.subheader("Reporte PDF (en desarrollo)")
-    st.info(
-        "Aquí se integrará un generador de PDF (por ejemplo con ReportLab o FPDF) "
-        "que combine KPIs, tablas ABC y gráficos clave en un informe ejecutivo listo para enviar."
-    )
+    st.success("✅ Reporte generado con éxito. Incluías: Datos consolidados, Análisis ABC y Top Velocidad.")
