@@ -1,0 +1,7 @@
+streamlit==1.29.0
+pandas==2.1.1
+numpy==1.24.4
+plotly==5.22.0
+openpyxl==3.1.2
+pyyaml==6.0.2
+python-dotenv==1.0.1

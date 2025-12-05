@@ -1,0 +1,20 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.*
+.venv/
+venv/
+.idea/
+.vscode/
+*.log
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Data
+data/raw/
+data/processed/
+*.xlsx
+*.xls

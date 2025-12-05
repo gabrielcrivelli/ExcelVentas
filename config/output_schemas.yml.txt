@@ -1,0 +1,26 @@
+schemas:
+  ejecutivo:
+    columns:
+      - Sucursal
+      - Año
+      - Mes
+      - Departamento
+      - Familia
+      - IdArticulo
+      - Descripcion
+      - Marca
+      - Cantidad
+      - ImporteTotal
+
+  stock_planning:
+    columns:
+      - Sucursal
+      - IdArticulo
+      - Descripcion
+      - Marca
+      - Departamento
+      - Familia
+      - Venta_Diaria_Prom
+      - Stock_15_Dias
+      - Stock_30_Dias
+      - Stock_60_Dias
