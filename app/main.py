@@ -1,4 +1,3 @@
-
 """
 Aplicación principal de Streamlit - BI Retail Analytics
 
@@ -10,6 +9,7 @@ Aplicación principal de Streamlit - BI Retail Analytics
 """
 
 
+import io
 import sys
 from pathlib import Path
 # Agregar el directorio raíz al path para permitir imports desde src/
@@ -69,7 +69,7 @@ st.subheader("1️⃣ Cargar y procesar datos")
 st.write(
     "- Subí los archivos Excel mensuales de cada sucursal en la barra lateral.\n"
     "- Elegí el esquema de columnas que querés en el Excel de salida.\n"
-    "- Presioná **“Procesar y consolidar”** para generar el dataset consolidado."
+    "- Presioná **"Procesar y consolidar"** para generar el dataset consolidado."
 )
 
 if run_btn:
@@ -109,9 +109,7 @@ if run_btn:
     processed_dir.mkdir(parents=True, exist_ok=True)
 
     parquet_path = processed_dir / "ventas_procesadas.parquet"
-    df_out.to_parquet(parquet_path, index=False)  # parquet estándar para pandas[web:108][web:113]
-
-    st.success(f"📁 Datos consolidados guardados en: `{parquet_path}`")
+    df_out.to_parquet(parquet_path, index=False)
 
     # 5) Mostrar preview en pantalla
     st.subheader("2️⃣ Vista previa de datos consolidados")
@@ -135,11 +133,10 @@ if run_btn:
 else:
     st.info(
         "👉 Subí archivos y configurá opciones en la barra lateral, "
-        "luego presioná **“Procesar y consolidar”** para comenzar."
+        "luego presioná **"Procesar y consolidar"** para comenzar."
     )
 
 st.markdown("---")
 st.caption(
-    "El archivo parquet generado (`data/processed/ventas_procesadas.parquet`) "
-    "es el que usan las demás páginas (ABC, Proyecciones, Comparativos, Reportes)."
+    "El archivo consolidado se usa en las demás páginas (ABC, Proyecciones, Comparativos, Reportes)."
 )
